@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Frank Scripts'
 description 'FW Rentals. This script took insperation from Prodigy RP 2.0 Rental System'
-version '1.0.0'
+version '1.0.1'
 
 ui_page 'web/dist/index.html'
 shared_scripts {
@@ -16,7 +16,9 @@ client_script {
     '@PolyZone/client.lua',
     '@PolyZone/BoxZone.lua',
     '@PolyZone/ComboZone.lua',
-    'client/*.lua'
+    'client/nui.lua',
+    'client/menu.lua',
+    'client/client.lua'
 }
 
 server_script {

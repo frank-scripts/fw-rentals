@@ -15,13 +15,14 @@ RegisterNuiCallback('selectVehicle', function(data, cb)
     NUI.Close()
     
     local vehicleId = data.vehicleId
-    local model, cost, rentalType
+    local model, deposit, payment, rentalType
     
     -- Find the vehicle in cars or bikes
     for i = 1, #cars do
         if cars[i].model == vehicleId then
             model = cars[i].model
-            cost = cars[i].cost
+            deposit = cars[i].cost.deposit
+            payment = cars[i].cost.payment
             rentalType = 'car'
             break
         end
@@ -31,7 +32,8 @@ RegisterNuiCallback('selectVehicle', function(data, cb)
         for i = 1, #bikes do
             if bikes[i].model == vehicleId then
                 model = bikes[i].model
-                cost = bikes[i].cost
+                deposit = bikes[i].cost.deposit
+                payment = bikes[i].cost.payment
                 rentalType = 'bike'
                 break
             end
@@ -39,7 +41,7 @@ RegisterNuiCallback('selectVehicle', function(data, cb)
     end
     
     if model then
-        TriggerEvent('qbx_rentals:client:spawnCar', model, cost, rentalType)
+        TriggerEvent('qbx_rentals:client:spawnCar', model, deposit, payment, rentalType)
     end
 end)
 
@@ -50,18 +52,26 @@ RegisterNetEvent('qbx_rentals:client:openMenu', function(rentalType)
     
     if rentalType == 'car' then
         for i = 1, #cars do
+            local v = cars[i]
             vehicles[i] = {
-                id = cars[i].model,
-                name = cars[i].model,
-                description = '$' .. cars[i].cost .. ' rental fee.'
+                id = v.model,
+                make = v.make,
+                name = v.label,
+                description = v.description,
+                deposit = v.cost.deposit,
+                payment = v.cost.payment
             }
         end
     elseif rentalType == 'bike' then
         for i = 1, #bikes do
+            local v = bikes[i]
             vehicles[i] = {
-                id = bikes[i].model,
-                name = bikes[i].model,
-                description = '$' .. bikes[i].cost .. ' rental fee.'
+                id = v.model,
+                make = v.make,
+                name = v.label,
+                description = v.description,
+                deposit = v.cost.deposit,
+                payment = v.cost.payment
             }
         end
     end
@@ -69,7 +79,7 @@ RegisterNetEvent('qbx_rentals:client:openMenu', function(rentalType)
     NUI.Open({ vehicles = vehicles })
 end)
 
-RegisterNetEvent('qbx_rentals:client:spawnCar', function(model, cost, rentalType)
+RegisterNetEvent('qbx_rentals:client:spawnCar', function(model, deposit, payment, rentalType)
     local player = PlayerPedId()
     local spawnPoint
 
@@ -90,7 +100,7 @@ RegisterNetEvent('qbx_rentals:client:spawnCar', function(model, cost, rentalType
         return
     end
 
-    local canPurchase = lib.callback.await('qbx_rentals:server:moneyCheck', false, model, cost, rentalType)
+    local canPurchase = lib.callback.await('qbx_rentals:server:moneyCheck', false, model, deposit, payment, rentalType)
 
     if not canPurchase then             
         lib.notify({

@@ -26,38 +26,18 @@ RegisterServerEvent('qbx_rentals:server:removepapers', function(source, plate, m
     ox_inventory:RemoveItem(source, 'rentalpapers', 1, item.metadata)
 end)
 
-local function moneyCheck(source, model, cost, rentalType)
-
-    if rentalType == 'car' then
-        for k, v in pairs(config.cars) do 
-            if model == v.model then
-                cost = v.cost
-            end
-
-            local player = QBX:GetPlayer(source)
-            if player.PlayerData.money.cash <= cost then 
-                return false
-            else
-                ox_inventory:RemoveItem(source, 'cash', cost)
-                return true
-            end
-        end
-    elseif rentalType == 'bike' then
-        for k, v in pairs(config.bikes) do 
-            if model == v.model then
-                cost = v.cost
-            end
-
-            local player = QBX:GetPlayer(source)
-            if player.PlayerData.money.cash <= cost then 
-                return false
-            else
-                ox_inventory:RemoveItem(source, 'cash', cost)
-                return true
-            end
-        end
+local function moneyCheck(source, model, deposit, payment, rentalType)
+    local totalCost = deposit + payment
+    local player = QBX:GetPlayer(source)
+    
+    if not player then return false end
+    
+    if player.PlayerData.money.cash < totalCost then 
+        return false
     end
-
+    
+    ox_inventory:RemoveItem(source, 'cash', totalCost)
+    return true
 end
 
 lib.callback.register('qbx_rentals:server:moneyCheck', moneyCheck)

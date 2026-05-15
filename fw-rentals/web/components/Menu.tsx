@@ -1,22 +1,24 @@
 import { useState, useRef, useEffect } from 'react';
 
-export interface Vehicle {
+export interface MenuItem {
   id: string;
-  make: string;
-  name: string;
-  description: string;
-  deposit: number;
-  payment: number;
+  label: string;
+  description?: string;
+  icon?: string;
+  metadata?: Record<string, any>;
+  closeOnClick?: boolean;
 }
 
-interface RentalMenuProps {
+interface MenuProps {
+  id: string;
   title: string;
-  vehicles: Vehicle[];
-  onSelect: (vehicle: Vehicle) => void;
+  items: MenuItem[];
+  position?: 'left' | 'right';
+  onSelect: (item: MenuItem) => void;
   onClose: () => void;
 }
 
-export default function RentalMenu({ title, vehicles, onSelect, onClose }: RentalMenuProps) {
+export default function Menu({ id, title, items, position = 'right', onSelect, onClose }: MenuProps) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -33,19 +35,27 @@ export default function RentalMenu({ title, vehicles, onSelect, onClose }: Renta
     const el = scrollRef.current;
     if (el) {
       el.addEventListener('scroll', handleScroll);
-      handleScroll(); // Check initial state
+      handleScroll();
       return () => el.removeEventListener('scroll', handleScroll);
     }
   }, []);
 
+  const positionClass = position === 'left' 
+    ? 'fixed left-0 top-0 h-full flex items-center pl-6' 
+    : 'fixed right-0 top-0 h-full flex items-center pr-6';
+
+  const rotation = position === 'left' 
+    ? 'rotateY(8deg) rotateX(2deg)' 
+    : 'rotateY(-8deg) rotateX(2deg)';
+
   return (
-    <div className="fixed right-0 top-0 h-full flex items-center pr-6 pointer-events-none"
+    <div className={`${positionClass} pointer-events-none`}
          style={{ perspective: '1200px' }}>
       <div 
         className="pointer-events-auto flex flex-col gap-2"
         style={{
           width: '420px',
-          transform: 'rotateY(-8deg) rotateX(2deg)',
+          transform: rotation,
           transformStyle: 'preserve-3d',
         }}
       >
@@ -60,7 +70,7 @@ export default function RentalMenu({ title, vehicles, onSelect, onClose }: Renta
             }}
           >
             <h1 
-              className="font-bold tracking-wide"
+              className="font-bold tracking-wide uppercase"
               style={{ 
                 color: '#fff',
                 fontSize: '15px',
@@ -86,18 +96,18 @@ export default function RentalMenu({ title, vehicles, onSelect, onClose }: Renta
         {/* Menu Items */}
         <div className="relative">
           <style>{`
-            .rental-scroll::-webkit-scrollbar {
+            .generic-scroll::-webkit-scrollbar {
               width: 6px;
             }
-            .rental-scroll::-webkit-scrollbar-track {
+            .generic-scroll::-webkit-scrollbar-track {
               background: rgba(0, 0, 0, 0.3);
               border-radius: 3px;
             }
-            .rental-scroll::-webkit-scrollbar-thumb {
+            .generic-scroll::-webkit-scrollbar-thumb {
               background: #a855f7;
               border-radius: 2px;
             }
-            .rental-scroll::-webkit-scrollbar-thumb:hover {
+            .generic-scroll::-webkit-scrollbar-thumb:hover {
               background: #c084fc;
             }
             .fade-overlay {
@@ -114,18 +124,18 @@ export default function RentalMenu({ title, vehicles, onSelect, onClose }: Renta
           />
           <div 
             ref={scrollRef}
-            className="rental-scroll flex flex-col gap-2 overflow-y-auto pr-4"
+            className="generic-scroll flex flex-col gap-2 overflow-y-auto pr-4"
             style={{
               maxHeight: '60vh',
             }}
           >
-          {vehicles.map((vehicle) => {
-            const isHovered = hoveredId === vehicle.id;
+          {items.map((item) => {
+            const isHovered = hoveredId === item.id;
             return (
               <button
-                key={vehicle.id}
-                onClick={() => onSelect(vehicle)}
-                onMouseEnter={() => setHoveredId(vehicle.id)}
+                key={item.id}
+                onClick={() => onSelect(item)}
+                onMouseEnter={() => setHoveredId(item.id)}
                 onMouseLeave={() => setHoveredId(null)}
                 className="flex items-center justify-between text-left transition-all duration-200 rounded-xl"
                 style={{
@@ -142,17 +152,6 @@ export default function RentalMenu({ title, vehicles, onSelect, onClose }: Renta
                 }}
               >
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span 
-                      className="font-medium uppercase tracking-wide"
-                      style={{ 
-                        color: 'rgba(255, 255, 255, 0.5)',
-                        fontSize: '11px',
-                      }}
-                    >
-                      {vehicle.make}
-                    </span>
-                  </div>
                   <h2 
                     className="font-semibold"
                     style={{ 
@@ -160,26 +159,19 @@ export default function RentalMenu({ title, vehicles, onSelect, onClose }: Renta
                       fontSize: '15px',
                     }}
                   >
-                    {vehicle.name}
+                    {item.label}
                   </h2>
-                  <p 
-                    className="truncate mt-1"
-                    style={{ 
-                      color: 'rgba(255, 255, 255, 0.55)',
-                      fontSize: '12px',
-                    }}
-                  >
-                    {vehicle.description}
-                  </p>
-                  <p 
-                    className="mt-1"
-                    style={{ 
-                      color: '#a78bfa',
-                      fontSize: '12px',
-                    }}
-                  >
-                    ${vehicle.payment} rental · ${vehicle.deposit} deposit
-                  </p>
+                  {item.description && (
+                    <p 
+                      className="truncate mt-1"
+                      style={{ 
+                        color: 'rgba(255, 255, 255, 0.55)',
+                        fontSize: '12px',
+                      }}
+                    >
+                      {item.description}
+                    </p>
+                  )}
                 </div>
                 <svg
                   className="flex-shrink-0 transition-all duration-200"

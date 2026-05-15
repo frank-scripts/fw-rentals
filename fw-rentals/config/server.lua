@@ -116,28 +116,141 @@ return {
     },
 
     cars = {
-
         {
-            model   = 'futo',
-            cost    = 600
+            make = "Pegassi",
+            label = "Faggio",
+            model = "faggio",
+            description = "A small, zippy scooter perfect for city commuting.",
+            cost = { deposit = 50, payment = 50 }
         },
         {
-            model = 'bison',
-            cost = 800,
+            make = "Declasse",
+            label = "Tulip Beater",
+            model = "tulip2",
+            description = "A rusted but reliable beater with character.",
+            cost = { deposit = 100, payment = 100 }
         },
-
+        {
+            make = "Maxwell",
+            label = "Asbo",
+            model = "asbo",
+            description = "A compact British hatchback with personality.",
+            cost = { deposit = 125, payment = 125 }
+        },
+        {
+            make = "Karin",
+            label = "Dilettante",
+            model = "dilettante",
+            description = "An affordable hybrid hatchback for the eco-conscious.",
+            cost = { deposit = 150, payment = 150 }
+        },
+        {
+            make = "Karin",
+            label = "Asterope",
+            model = "asterope",
+            description = "A reliable mid-size sedan for everyday driving.",
+            cost = { deposit = 200, payment = 200 }
+        },
+        {
+            make = "Cheval",
+            label = "Surge",
+            model = "surge",
+            description = "A modern electric sedan with zero emissions.",
+            cost = { deposit = 300, payment = 300 }
+        },
+        {
+            make = "Vapid",
+            label = "Stanier",
+            model = "stanier",
+            description = "A classic American sedan with room to spare.",
+            cost = { deposit = 350, payment = 350 }
+        },
+        {
+            make = "Ubermacht",
+            label = "Oracle XS",
+            model = "oracle2",
+            description = "A luxury German sedan with sporty handling.",
+            cost = { deposit = 400, payment = 400 }
+        },
+        {
+            make = "Karin",
+            label = "Asterope GZ",
+            model = "asterope2",
+            description = "A premium sedan with upgraded features.",
+            cost = { deposit = 450, payment = 450 }
+        },
+        {
+            make = "Ubermacht",
+            label = "Sentinel",
+            model = "sentinel",
+            description = "A sleek German coupe with performance in mind.",
+            cost = { deposit = 450, payment = 450 }
+        },
+        {
+            make = "Canis",
+            label = "Kamacho",
+            model = "kamacho",
+            description = "A rugged SUV ready for any terrain.",
+            cost = { deposit = 500, payment = 500 }
+        },
+        {
+            make = "Bravado",
+            label = "Gresley",
+            model = "gresley",
+            description = "A spacious SUV for the whole family.",
+            cost = { deposit = 500, payment = 500 }
+        },
+        {
+            make = "Bravado",
+            label = "Buffalo",
+            model = "buffalo",
+            description = "A muscle car disguised as a family sedan.",
+            cost = { deposit = 500, payment = 500 }
+        },
+        {
+            make = "Karin",
+            label = "Sultan",
+            model = "sultan",
+            description = "A legendary sports sedan with rally heritage.",
+            cost = { deposit = 500, payment = 500 }
+        },
+        {
+            make = "Karin",
+            label = "Dilettante DX",
+            model = "dilettante2",
+            description = "An upgraded hybrid with more power and style.",
+            cost = { deposit = 600, payment = 600 }
+        },
+        {
+            make = "Bravado",
+            label = "Bison",
+            model = "bison",
+            description = "A tough pickup truck for work or play.",
+            cost = { deposit = 600, payment = 600 }
+        },
+        {
+            make = "Vapid",
+            label = "Speedo",
+            model = "speedo",
+            description = "A cargo van for all your hauling needs.",
+            cost = { deposit = 750, payment = 750 }
+        },
     },
 
     bikes = {
-
         {
-            model   = 'scorcher',
-            cost    = 20
+            make = "Shitzu",
+            label = "Scorcher",
+            model = "scorcher",
+            description = "A mountain bike built for off-road trails.",
+            cost = { deposit = 20, payment = 20 }
         },
         {
-            model   = 'bmx',
-            cost    = 40
+            make = "BMX",
+            label = "BMX",
+            model = "bmx",
+            description = "A classic BMX for tricks and cruising.",
+            cost = { deposit = 40, payment = 40 }
         },
-
     }
 }

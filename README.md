@@ -1,6 +1,8 @@
 # fw-rentals
-QBOX Compatible Rental System on your FiveM server... Just like Prodigy RP 2.0 UI.
-A vehicle rental system for QBX servers featuring a custom NUI menu with a 3D tilted design.
+
+**Version 1.0.1**
+
+QBOX Compatible Rental System for FiveM servers with a custom NUI menu inspired by Prodigy RP 2.0.
 
 ## Dependencies
 
@@ -12,34 +14,71 @@ A vehicle rental system for QBX servers featuring a custom NUI menu with a 3D ti
 
 ## Installation
 
-1. Place the resource in your resources folder
-2. Ensure all dependencies are installed and started
-3. Add `ensure qbx_rentals` to your server.cfg
-4. Build the web UI (see Web UI section below)
+1. Download or clone this resource into your server's `resources` folder
+2. Ensure all dependencies are installed and running
+3. Build the web UI:
+   ```bash
+   cd web
+   npm install
+   npm run build
+   ```
+4. Add `ensure fw-rentals` to your `server.cfg` (after dependencies)
+5. Configure rental locations and vehicles in `config/server.lua`
+6. Restart your server or refresh resources
+
+## Optional: Replace ox_lib Menus
+
+This resource includes modified ox_lib files that replace the default ox_lib menus with the custom purple UI. This allows you to use the same UI style across your entire server.
+
+### Steps to Replace ox_lib Menus
+
+1. Navigate to your `ox_lib/resource/interface/client/` folder
+2. Replace the following files with the versions from this resource:
+   - `menu.lua` → Use `/REPLACE ME OX LIB/menu.lua`
+   - `context.lua` → Use `/REPLACE ME OX LIB/context.lua`
+3. Restart your server
+
+### What This Does
+
+- `lib.showMenu()` and `lib.registerMenu()` will use the custom UI
+- `lib.showContext()` and `lib.registerContext()` will use the custom UI
+- All existing ox_lib menu calls in your other resources will automatically use the new UI
+- Callbacks (`onSelect`, `event`, `serverEvent`) work exactly as before
+
+### Compatibility
+
+- Works with existing resources using ox_lib menus
+- No changes needed to your other scripts
+- Supports all ox_lib menu features (icons, descriptions, callbacks, nested menus)
 
 ## File Structure
 
 ```
 fw-rentals/
-├── fxmanifest.lua          # Resource manifest
-├── config/
-│   ├── client.lua          # Client config (debug mode)
-│   └── server.lua          # Rental locations, vehicles, pricing
-├── client/
-│   ├── client.lua          # Main client logic (spawning, targeting, NUI)
-│   ├── main.lua            # Additional client code
-│   └── nui.lua             # NUI helper functions (Open, Close, SendMessage)
-├── server/
-│   ├── main.lua            # Additional server code
-│   └── server.lua          # Server callbacks (money check, vehicle spawning)
-└── web/
-    ├── App.tsx             # Main React app entry
-    ├── components/
-    │   └── RentalMenu.tsx  # Rental menu UI component
-    ├── hooks/
-    │   └── useNui.ts       # NUI communication hooks
-    ├── styles.css          # Global styles
-    └── index.tsx           # React root
++-- fxmanifest.lua              # Resource manifest
++-- config/
+|   +-- client.lua              # Client config (debug mode)
+|   +-- server.lua              # Rental locations, vehicles, pricing
++-- client/
+|   +-- client.lua              # Main client logic (spawning, targeting, NUI)
+|   +-- main.lua                # Additional client code
+|   +-- nui.lua                 # NUI helper functions (Open, Close, SendMessage)
+|   +-- menu.lua                # Custom menu system exports
++-- server/
+|   +-- main.lua                # Additional server code
+|   +-- server.lua              # Server callbacks (money check, vehicle spawning)
++-- web/
+|   +-- App.tsx                 # Main React app entry
+|   +-- components/
+|   |   +-- RentalMenu.tsx      # Rental menu UI component
+|   |   +-- Menu.tsx            # Generic menu component
+|   +-- hooks/
+|   |   +-- useNui.ts           # NUI communication hooks
+|   +-- styles.css              # Global styles
+|   +-- index.tsx               # React root
++-- REPLACE ME OX LIB/
+    +-- menu.lua                # ox_lib menu replacement
+    +-- context.lua             # ox_lib context replacement
 ```
 
 ## Configuration
@@ -63,13 +102,12 @@ rentalLocations = {
 **Vehicles:**
 ```lua
 cars = {
-    { model = 'futo', cost = 600 },
-    { model = 'bison', cost = 800 },
+    { make = 'BF', model = 'faggio', label = 'Faggio', description = 'A cheap scooter', cost = { deposit = 100, payment = 50 } },
+    { make = 'Vapid', model = 'bison', label = 'Bison', description = 'A work truck', cost = { deposit = 200, payment = 150 } },
 }
 
 bikes = {
-    { model = 'scorcher', cost = 20 },
-    { model = 'bmx', cost = 40 },
+    { make = 'Pedal', model = 'scorcher', label = 'Scorcher', description = 'Mountain bike', cost = { deposit = 20, payment = 10 } },
 }
 ```
 
@@ -83,7 +121,11 @@ return {
 
 ## Web UI
 
-The UI is built with React + TypeScript. The menu features a 3D tilted perspective and dynamic scroll fade.
+The UI is built with React + TypeScript featuring:
+- 3D tilted perspective
+- Dynamic scroll fade
+- Custom purple scrollbar
+- Right-side positioning
 
 ### Building
 
@@ -99,39 +141,23 @@ The build output goes to `web/dist/` which is loaded by FiveM.
 
 Run `npm run dev` to preview the UI in a browser with mock data.
 
-## NUI Communication
+## Exports
 
-### Events (Client → UI)
+### Client Exports (menu.lua)
 
-| Action | Data | Description |
-|--------|------|-------------|
-| `open` | `{ vehicles: Vehicle[] }` | Opens the menu with vehicle list |
-| `close` | - | Closes the menu |
+```lua
+-- Open a custom menu
+exports['fw-rentals']:openMenu(id, title, items, options)
 
-### Callbacks (UI → Client)
+-- Close the current menu
+exports['fw-rentals']:closeMenu()
 
-| Callback | Data | Response | Description |
-|----------|------|----------|-------------|
-| `selectVehicle` | `{ vehicleId: string }` | `{ success: true }` | Player selects a vehicle |
+-- Register a reusable menu
+exports['fw-rentals']:registerMenu(id, data)
 
-### Vehicle Data Structure
-
-```typescript
-interface Vehicle {
-    id: string;          // Vehicle model name
-    name: string;        // Display name
-    description: string; // Cost info (e.g., "$600 rental fee.")
-}
+-- Open a registered menu
+exports['fw-rentals']:openRegisteredMenu(id)
 ```
-
-## Server Callbacks
-
-| Callback | Parameters | Returns | Description |
-|----------|------------|---------|-------------|
-| `qbx_rentals:server:getTables` | `rentalType` ('locations'/'car'/'bike') | table | Fetches config tables |
-| `qbx_rentals:server:moneyCheck` | `source, model, cost, rentalType` | boolean | Validates & deducts payment |
-| `qbx_rentals:server:spawnVehicle` | `source, model, coords` | netId | Spawns rental vehicle |
-| `qbx_rentals:server:deleteVehicle` | `source, netId` | boolean | Deletes rental vehicle |
 
 ## Features
 
@@ -142,7 +168,23 @@ interface Vehicle {
 - **Rental Papers**: Gives inventory item with vehicle details
 - **Vehicle Keys**: Integrates with vehiclekeys system
 - **Payment**: Deducts cash from player inventory
+- **Custom UI**: Purple-themed menu with 3D tilt and smooth animations
+
+---
+
+## Changelog
+
+### Version 1.0.1
+- Improved UI fade at bottom for when it has a scroll menu
+- All New scrollbar Inspired from Prodigys
+- Improved UI Support for OX LIB Context Menu and OX LIB Menus
+- Added more vehicles to rental options and descriptions to the vehicles instead of showing model name and just price
+
+### Version 1.0.0
+- Simple Menu for Rental System Inspired from Prodigy RP 2.0, with basic cars setup and bike rentals for QBX
+
+---
 
 ## Credits
 
-Inspired by qb-rentals by Carbon#1002 and g-bikerentals by Giana.
+Inspired by Prodigy RP 2.0 UI for their Rental System.
